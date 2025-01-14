@@ -34,7 +34,16 @@ async function run() {
 
         //user releted apis starts
 
+        app.post("/users", async (req, res) => {
+            const user = req.body
+            const result = await useCollection.insertOne(user)
+            res.send(result)
+        })
 
+        app.get("/users", async (req, res) => {
+            const result = await useCollection.find().toArray()
+            res.send(result)
+        })
 
         //user releted apis ends
 
