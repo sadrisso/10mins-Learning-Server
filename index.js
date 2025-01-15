@@ -11,7 +11,7 @@ app.use(cors())
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.oq68b.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -34,7 +34,6 @@ async function run() {
 
 
         //user releted apis starts
-
         app.post("/users", async (req, res) => {
             const user = req.body
             const result = await useCollection.insertOne(user)
@@ -45,15 +44,26 @@ async function run() {
             const result = await useCollection.find().toArray()
             res.send(result)
         })
-
         //user releted apis ends
 
 
 
-        //study session apis starts
+        //study session releted apis starts
+        app.get("/approvedStudySessions", async (req, res) => {
+            const query = { status: "ongoing" }
+            const result = await studySessionsCollection.find(query).limit(6).toArray();
+            res.send(result)
+        })
 
-        app.get("/studySessions", async (req, res) => {
-            const result = await studySessionsCollection.find().toArray();
+        app.get("/allStudySessions", async (req, res) => {
+            const result = await studySessionsCollection.find().toArray()
+            res.send(result)
+        })
+
+        app.get("/studySession/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await studySessionsCollection.findOne(query)
             res.send(result)
         })
 
@@ -62,8 +72,7 @@ async function run() {
             const result = await studySessionsCollection.insertOne(data)
             res.send(result)
         })
-
-        //study session apis ends
+        //study session releted apis ends
 
 
 
