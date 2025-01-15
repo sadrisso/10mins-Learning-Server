@@ -29,19 +29,25 @@ async function run() {
         await client.connect();
 
 
-        const useCollection = client.db("learningDB").collection("users")
+        const userCollection = client.db("learningDB").collection("users")
         const studySessionsCollection = client.db("learningDB").collection("studySessions")
 
 
         //user releted apis starts
         app.post("/users", async (req, res) => {
             const user = req.body
-            const result = await useCollection.insertOne(user)
+            const result = await userCollection.insertOne(user)
             res.send(result)
         })
 
         app.get("/users", async (req, res) => {
-            const result = await useCollection.find().toArray()
+            const result = await userCollection.find().toArray()
+            res.send(result)
+        })
+
+        app.get("/tutor", async (req, res) => {
+            const filter = {role: "Tutor"}
+            const result = await userCollection.find(filter).toArray()
             res.send(result)
         })
         //user releted apis ends
