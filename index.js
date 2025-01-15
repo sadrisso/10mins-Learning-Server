@@ -30,6 +30,7 @@ async function run() {
 
 
         const useCollection = client.db("learningDB").collection("users")
+        const studySessionsCollection = client.db("learningDB").collection("studySessions")
 
 
         //user releted apis starts
@@ -46,6 +47,23 @@ async function run() {
         })
 
         //user releted apis ends
+
+
+
+        //study session apis starts
+
+        app.get("/studySessions", async (req, res) => {
+            const result = await studySessionsCollection.find().toArray();
+            res.send(result)
+        })
+
+        app.post("/studySessions", async (req, res) => {
+            const data = req.body;
+            const result = await studySessionsCollection.insertOne(data)
+            res.send(result)
+        })
+
+        //study session apis ends
 
 
 
