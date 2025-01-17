@@ -26,11 +26,15 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
 
 
         const userCollection = client.db("learningDB").collection("users")
+        const notesCollection = client.db("learningDB").collection("notes")
         const studySessionsCollection = client.db("learningDB").collection("studySessions")
+
+
+
 
 
         //user releted apis starts
@@ -46,11 +50,25 @@ async function run() {
         })
 
         app.get("/tutor", async (req, res) => {
-            const filter = {role: "Tutor"}
+            const filter = { role: "Tutor" }
             const result = await userCollection.find(filter).toArray()
             res.send(result)
         })
         //user releted apis ends
+
+
+        //notes releted apis starts from here
+        app.post("/myNotes", async (req, res) => {
+            const note = req.body;
+            const result = await notesCollection.insertOne(note)
+            res.send(result)
+        })
+
+        app.get("/myNotes", async (req, res) => {
+            const notes = await notesCollection.find().toArray()
+            res.send(notes)
+        })
+        //notes releted apis ends here
 
 
 
@@ -79,6 +97,9 @@ async function run() {
             res.send(result)
         })
         //study session releted apis ends
+
+
+
 
 
 
