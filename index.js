@@ -68,6 +68,37 @@ async function run() {
             const notes = await notesCollection.find().toArray()
             res.send(notes)
         })
+
+        app.get("/myNotes/:id", async (req, res) => {
+            const id = req.params;
+            const filter = { _id: new ObjectId(id) }
+            const result = await notesCollection.findOne(filter)
+            res.send(result)
+        })
+
+        app.delete("/myNotes/:id", async (req, res) => {
+            const id = req.params
+            const filter = { _id: new ObjectId(id) }
+            const result = await notesCollection.deleteOne(filter)
+            res.send(result)
+        })
+
+        app.patch("/updateNote/:id", async (req, res) => {
+            const id = req.params
+            const updateInfo = req.body
+            const filter = {_id: new ObjectId(id)}
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    title: updateInfo?.title,
+                    email: updateInfo?.email,
+                    description: updateInfo?.description
+                }
+            }
+
+            const result = await notesCollection.updateOne(filter, updateDoc, options)
+            res.send(result)
+        })
         //notes releted apis ends here
 
 
