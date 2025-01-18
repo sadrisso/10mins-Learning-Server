@@ -35,11 +35,15 @@ async function run() {
 
 
 
-
-
         //user releted apis starts
         app.post("/users", async (req, res) => {
             const user = req.body
+            const query = { email: user?.email }
+            const existingUser = await userCollection.findOne(query)
+
+            if (existingUser) {
+                return res.send({ message: "user already exist" })
+            }
             const result = await userCollection.insertOne(user)
             res.send(result)
         })
@@ -86,7 +90,7 @@ async function run() {
         app.patch("/updateNote/:id", async (req, res) => {
             const id = req.params
             const updateInfo = req.body
-            const filter = {_id: new ObjectId(id)}
+            const filter = { _id: new ObjectId(id) }
             const options = { upsert: true };
             const updateDoc = {
                 $set: {
