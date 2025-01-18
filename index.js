@@ -53,12 +53,31 @@ async function run() {
             res.send(result)
         })
 
+        app.patch("/users/admin/:id", async (req, res) => {
+            const id = req.params;
+            const info = req.body;
+            const filter = {_id: new ObjectId(id)}
+            const updateDoc = {
+                $set: {
+                    role: info.role
+                }
+            }
+
+            const result = await userCollection.updateOne(filter, updateDoc)
+            res.send(result)
+        })
+        //user releted apis ends
+
+
+
+        //tutor releted apis starts from here
         app.get("/tutor", async (req, res) => {
             const filter = { role: "Tutor" }
             const result = await userCollection.find(filter).toArray()
             res.send(result)
         })
-        //user releted apis ends
+        //tutor releted apis ends here
+
 
 
         //notes releted apis starts from here
@@ -132,7 +151,6 @@ async function run() {
             res.send(result)
         })
         //study session releted apis ends
-
 
 
 
