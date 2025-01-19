@@ -33,6 +33,7 @@ async function run() {
         const userCollection = client.db("learningDB").collection("users")
         const notesCollection = client.db("learningDB").collection("notes")
         const studySessionsCollection = client.db("learningDB").collection("studySessions")
+        const bookedSessionsCollection = client.db("learningDB").collection("bookedSessions")
 
 
         //jwt releted apis starts from here
@@ -93,6 +94,24 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc)
             res.send(result)
         })
+
+        // app.get("/users/admin/:email", async (req, res) => {
+        //     const email = req.params.email;
+
+        //     if (email !== req.decoded?.email) {
+        //         return res.status(403).send({ message: "unauthorized access" })
+        //     }
+
+        //     const filter = { email: email }
+        //     const user = await userCollection.findOne(filter)
+
+        //     let admin = false
+        //     if (user) {
+        //         admin = user?.role === "Admin"
+        //     }
+
+        //     res.send({ admin })
+        // })
         //user releted apis ends
 
 
@@ -165,7 +184,7 @@ async function run() {
             res.send(result)
         })
 
-        app.get("/studySession/:id", async (req, res) => {
+        app.get("/studySession/:id", verifyToken, async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await studySessionsCollection.findOne(query)
@@ -175,6 +194,52 @@ async function run() {
         app.post("/studySessions", async (req, res) => {
             const data = req.body;
             const result = await studySessionsCollection.insertOne(data)
+            res.send(result)
+        })
+
+        app.post("/bookedSessions", async (req, res) => {
+            const data = req.body;
+            const result = await bookedSessionsCollection.insertOne(data)
+            res.send(result)
+        })
+
+        app.get("/bookedSessions", async (req, res) => {
+            const result = await bookedSessionsCollection.find().toArray();
+            res.send(result)
+        })
+
+        app.get("/bookedSession/:id", async (req, res) => {
+            const id = req.params
+            const filter = {_id: new ObjectId(id)}
+            const result = await bookedSessionsCollection.findOne(filter)
+            res.send(result)
+        })
+
+        // app.patch("/bookedSession/:id", async (req, res) => {
+        //     const id = req.params
+        //     const updateInfo = req.body
+        //     const filter = { _id: new ObjectId(id) }
+        //     const updateDoc = {
+        //         $set: {
+                    
+        //         }
+        //     }
+
+        //     const result = await bookedSessionsCollection.updateOne(filter, updateDoc)
+        //     res.send(result)
+        // })
+
+        app.patch("/studySessions/:id", async (req, res) => {
+            const id = req.params;
+            const info = req.body;
+            const filter = { _id: new ObjectId(id) }
+            const updateDoc = {
+                $set: {
+                    status: info.status
+                }
+            }
+
+            const result = await studySessionsCollection.updateOne(filter, updateDoc)
             res.send(result)
         })
         //study session releted apis ends
