@@ -44,7 +44,7 @@ async function run() {
         })
 
         const verifyToken = (req, res, next) => {
-            console.log("inside verify token : ", req.headers.authorization)
+            // console.log("inside verify token : ", req.headers.authorization)
 
             if (!req?.headers?.authorization) {
                 return res.status(401).send({ message: 'forbidded access' })
@@ -77,7 +77,18 @@ async function run() {
         })
 
         app.get("/users", verifyToken, async (req, res) => {
-            const result = await userCollection.find().toArray()
+            const search = req.query.search
+            let query = {}
+
+            if (search) {
+                query = { name: { $regex: search, $options: "i" } }
+            }
+
+            if (search) {
+                query = { email: { $regex: search, $options: "i" } }
+            }
+
+            const result = await userCollection.find(query).toArray()
             res.send(result)
         })
 
@@ -209,8 +220,8 @@ async function run() {
         })
 
         app.get("/bookedSession/:id", async (req, res) => {
-            const id = req.params
-            const filter = {_id: new ObjectId(id)}
+            const id = req.params.id
+            const filter = { _id: new ObjectId(id) }
             const result = await bookedSessionsCollection.findOne(filter)
             res.send(result)
         })
@@ -221,7 +232,6 @@ async function run() {
         //     const filter = { _id: new ObjectId(id) }
         //     const updateDoc = {
         //         $set: {
-                    
         //         }
         //     }
 
