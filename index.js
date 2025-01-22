@@ -34,6 +34,7 @@ async function run() {
         const notesCollection = client.db("learningDB").collection("notes")
         const studySessionsCollection = client.db("learningDB").collection("studySessions")
         const bookedSessionsCollection = client.db("learningDB").collection("bookedSessions")
+        const uploadedMaterialsCollection = client.db("learningDB").collection("uploadedMaterials")
 
 
         //jwt releted apis starts from here
@@ -92,6 +93,13 @@ async function run() {
             res.send(result)
         })
 
+        app.get("/user/:email", async (req, res) => {
+            const email = req.params.email;
+            const filter = { email }
+            const result = await userCollection.findOne(filter)
+            res.send(result)
+        })
+
         app.patch("/users/admin/:id", async (req, res) => {
             const id = req.params;
             const info = req.body;
@@ -133,6 +141,24 @@ async function run() {
             const result = await userCollection.find(filter).toArray()
             res.send(result)
         })
+
+        app.post("/uploadMaterial", async (req, res) => {
+            const data = req.body
+            const result = await uploadedMaterialsCollection.insertOne(data)
+            res.send(result)
+        })
+
+        app.get("/uploadedMaterials", async (req, res) => {
+            const result = await uploadedMaterialsCollection.find().toArray()
+            res.send(result)
+        })
+
+        app.get("/uploadedMaterials/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = {_id: new ObjectId(id)}
+            const result = await uploadedMaterialsCollection.findOne(filter)
+            res.send(result)
+        })
         //tutor releted apis ends here
 
 
@@ -150,21 +176,21 @@ async function run() {
         })
 
         app.get("/myNotes/:id", async (req, res) => {
-            const id = req.params;
+            const id = req.params.id;
             const filter = { _id: new ObjectId(id) }
             const result = await notesCollection.findOne(filter)
             res.send(result)
         })
 
         app.delete("/myNotes/:id", async (req, res) => {
-            const id = req.params
+            const id = req.params.id
             const filter = { _id: new ObjectId(id) }
             const result = await notesCollection.deleteOne(filter)
             res.send(result)
         })
 
         app.patch("/updateNote/:id", async (req, res) => {
-            const id = req.params
+            const id = req.params.id
             const updateInfo = req.body
             const filter = { _id: new ObjectId(id) }
             const options = { upsert: true };
@@ -192,6 +218,13 @@ async function run() {
 
         app.get("/allStudySessions", async (req, res) => {
             const result = await studySessionsCollection.find().toArray()
+            res.send(result)
+        })
+
+        app.delete("/studySession/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const result = await studySessionsCollection.deleteOne(filter)
             res.send(result)
         })
 
@@ -226,18 +259,14 @@ async function run() {
             res.send(result)
         })
 
-        // app.patch("/bookedSession/:id", async (req, res) => {
-        //     const id = req.params
-        //     const updateInfo = req.body
-        //     const filter = { _id: new ObjectId(id) }
-        //     const updateDoc = {
-        //         $set: {
-        //         }
-        //     }
+        app.get("/isSessionBooked/:studentEmail/:studentSessionId", async (req, res) => {
+            const studentEmail = req?.params?.studentEmail
+            const studentSessionId = req?.params?.studentSessionId
+            const filter = { studentEmail: studentEmail, studySessionId: studentSessionId }
+            const result = await bookedSessionsCollection.findOne(filter)
+            res.send(result)
+        })
 
-        //     const result = await bookedSessionsCollection.updateOne(filter, updateDoc)
-        //     res.send(result)
-        // })
 
         app.patch("/studySessions/:id", async (req, res) => {
             const id = req.params;
