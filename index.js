@@ -35,6 +35,7 @@ async function run() {
         const studySessionsCollection = client.db("learningDB").collection("studySessions")
         const bookedSessionsCollection = client.db("learningDB").collection("bookedSessions")
         const uploadedMaterialsCollection = client.db("learningDB").collection("uploadedMaterials")
+        const reviewsCollection = client.db("learningDB").collection("reviews")
 
 
         //jwt releted apis starts from here
@@ -153,10 +154,42 @@ async function run() {
             res.send(result)
         })
 
-        app.get("/uploadedMaterials/:id", async (req, res) => {
+        app.get("/uploadedMaterial/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { uploadMaterialId: id }
+            const result = await uploadedMaterialsCollection.find(filter).toArray()
+            res.send(result)
+        })
+
+        app.get("/editMaterial/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const result = await uploadedMaterialsCollection.findOne(filter)
+            res.send(result)
+        })
+
+        app.patch("/editStudyMaterial/:id", async (req, res) => {
             const id = req.params.id;
             const filter = {_id: new ObjectId(id)}
-            const result = await uploadedMaterialsCollection.findOne(filter)
+            const updateInfo = req.body;
+
+            const updateDoc = {
+                $set: {
+                    title: updateInfo?.title,
+                    uploadMaterialId: updateInfo?.uploadMaterialId,
+                    tutorEmail: updateInfo?.tutorEmail,
+                    link: updateInfo?.link
+                },
+            };
+
+            const result = await uploadedMaterialsCollection.updateOne(filter, updateDoc)
+            res.send(result)
+        })
+
+        app.delete("/studyMaterial/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const result = await uploadedMaterialsCollection.deleteOne(filter)
             res.send(result)
         })
         //tutor releted apis ends here
@@ -282,6 +315,30 @@ async function run() {
             res.send(result)
         })
         //study session releted apis ends
+
+
+
+        //reviews api starts from here
+        app.post("/reviews", async (req, res) => {
+            const review = req.body;
+            const result = await reviewsCollection.insertOne(review)
+            res.send(result)
+        })
+
+
+        app.get("/reviews", async (req, res) => {
+            const result = await reviewsCollection.find().toArray()
+            res.send(result)
+        })
+
+
+        app.get("/review/:id", async (req, res) => {
+            const id = req.params.id
+            const filter = { bookedSessionId: id }
+            const result = await reviewsCollection.find(filter).toArray()
+            res.send(result)
+        })
+        //reviews api ends from here
 
 
 
