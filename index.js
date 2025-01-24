@@ -49,13 +49,13 @@ async function run() {
             // console.log("inside verify token : ", req.headers.authorization)
 
             if (!req?.headers?.authorization) {
-                return res.status(401).send({ message: 'forbidded access' })
+                return res.status(401).send({ message: 'unauthorized access' })
             }
             const token = req?.headers?.authorization.split(" ")[1]
 
             jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
                 if (err) {
-                    return res.status(401).send({ message: 'forbidden access' })
+                    return res.status(401).send({ message: 'unauthorized access' })
                 }
                 req.decoded = decoded;
                 next();
@@ -115,28 +115,66 @@ async function run() {
             res.send(result)
         })
 
-        // app.get("/users/admin/:email", async (req, res) => {
-        //     const email = req.params.email;
+        app.get("/user/admin/:email", verifyToken, async (req, res) => {
+            const email = req.params.email;
 
-        //     if (email !== req.decoded?.email) {
-        //         return res.status(403).send({ message: "unauthorized access" })
-        //     }
+            if (email !== req?.decoded?.email) {
+                return res.status(403).send({ message: "forbidden access" })
+            }
 
-        //     const filter = { email: email }
-        //     const user = await userCollection.findOne(filter)
+            const filter = { email }
+            const user = await userCollection.findOne(filter)
 
-        //     let admin = false
-        //     if (user) {
-        //         admin = user?.role === "Admin"
-        //     }
+            let admin = false
+            if (user) {
+                admin = user?.role === "Admin"
+            }
 
-        //     res.send({ admin })
-        // })
+            res.send({ admin })
+        })
+
+
+        app.get("/user/student/:email", verifyToken, async (req, res) => {
+            const email = req.params.email;
+
+            if (email !== req?.decoded?.email) {
+                return res.status(403).send({ message: "forbidden access" })
+            }
+
+            const filter = { email }
+            const user = await userCollection.findOne(filter)
+
+            let student = false
+            if (user) {
+                student = user?.role === "Student"
+            }
+
+            res.send({ student })
+        })
         //user releted apis ends
 
 
 
         //tutor releted apis starts from here
+        app.get("/user/tutor/:email", verifyToken, async (req, res) => {
+            const email = req.params.email;
+
+            if (email !== req?.decoded?.email) {
+                return res.status(403).send({ message: "forbidden access" })
+            }
+
+            const filter = { email }
+            const user = await userCollection.findOne(filter)
+
+            let tutor = false
+            if (user) {
+                tutor = user?.role === "Tutor"
+            }
+
+            res.send({ tutor })
+        })
+
+
         app.get("/tutors", async (req, res) => {
             const filter = { role: "Tutor" }
             const result = await userCollection.find(filter).toArray()
