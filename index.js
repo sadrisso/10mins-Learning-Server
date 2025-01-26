@@ -241,9 +241,16 @@ async function run() {
             res.send(result)
         })
 
-        app.get("/myNotes", async (req, res) => {
+        app.get("/myNotes", verifyToken, async (req, res) => {
             const notes = await notesCollection.find().toArray()
             res.send(notes)
+        })
+
+        app.get("/myNote/:email", async (req, res) => {
+            const email = req.params.email
+            const filter = {email}
+            const result = await notesCollection.find(filter).toArray()
+            res.send(result)
         })
 
         app.get("/myNotes/:id", async (req, res) => {
@@ -320,6 +327,13 @@ async function run() {
 
         app.get("/bookedSessions", async (req, res) => {
             const result = await bookedSessionsCollection.find().toArray();
+            res.send(result)
+        })
+
+        app.get("/bookedSessions/:email", async (req, res) => {
+            const email = req.params.email
+            const filter = {studentEmail: email}
+            const result = await bookedSessionsCollection.find(filter).toArray()
             res.send(result)
         })
 
