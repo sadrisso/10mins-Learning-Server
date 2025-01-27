@@ -194,7 +194,7 @@ async function run() {
 
         app.get("/uploadedMaterial/:id", async (req, res) => {
             const id = req.params.id;
-            const filter = { uploadMaterialId: id }
+            const filter = { sessionId: id }
             const result = await uploadedMaterialsCollection.find(filter).toArray()
             res.send(result)
         })
@@ -208,7 +208,7 @@ async function run() {
 
         app.patch("/editStudyMaterial/:id", async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: new ObjectId(id)}
+            const filter = { _id: new ObjectId(id) }
             const updateInfo = req.body;
 
             const updateDoc = {
@@ -248,7 +248,7 @@ async function run() {
 
         app.get("/myNote/:email", async (req, res) => {
             const email = req.params.email
-            const filter = {email}
+            const filter = { email }
             const result = await notesCollection.find(filter).toArray()
             res.send(result)
         })
@@ -332,7 +332,7 @@ async function run() {
 
         app.get("/bookedSessions/:email", async (req, res) => {
             const email = req.params.email
-            const filter = {studentEmail: email}
+            const filter = { studentEmail: email }
             const result = await bookedSessionsCollection.find(filter).toArray()
             res.send(result)
         })
@@ -384,9 +384,9 @@ async function run() {
         })
 
 
-        app.get("/review/:id", async (req, res) => {
+        app.get("/reviews/:id", async (req, res) => {
             const id = req.params.id
-            const filter = { bookedSessionId: id }
+            const filter = { studySessionId: id }
             const result = await reviewsCollection.find(filter).toArray()
             res.send(result)
         })
